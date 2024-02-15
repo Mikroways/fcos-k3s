@@ -31,3 +31,8 @@ systemctl para inicializar el sistema.
 
 Este repositorio usará la registry de github para promover su uso desde este
 ejemplo usando GH Actions.
+
+Las imagenes que se generan son:
+
+* **K3s Server:** 
+* **K3s Agent:**

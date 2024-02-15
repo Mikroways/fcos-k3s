@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: ${{ github.repository }}/server
-  AGENT_IMAGE_NAME: ${{ github.repository }}/agent
+  SERVER_IMAGE_NAME: ${{ env.REGISTRY}}/${{ github.repository }}/server
+  AGENT_IMAGE_NAME: ${{ env.REGISTRY}}/${{ github.repository }}/agent
 
 jobs:
   build-and-push-image:
@@ -43,7 +43,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: ${{ env.REGISTRY }}/server:latest
+        tags: ${{ env.SERVER_IMAGE_NAME }}/server:latest
         context: "{{defaultContext}}:layered-image"
         file: ./Containerfile
         target: server
@@ -52,5 +52,5 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: ${{ env.REGISTRY }}/agent:latest
+        tags: ${{ env.AGENT_IMAGE_NAME }}/agent:latest
         target: agent
