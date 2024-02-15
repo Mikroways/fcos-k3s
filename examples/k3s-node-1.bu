@@ -1,0 +1,19 @@
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: rpm-ostree-install-customizations.service
+      enabled: true
+      contents_local: ignition-assets/rpm-ostree-install-customizations-agent.service
+storage:
+  links:
+    - path: /etc/localtime
+      target: ../usr/share/zoneinfo/America/Argentina/Buenos_Aires
+  files:
+    - path: /etc/rancher/k3s/config.yaml
+      mode: 0600
+      contents:
+        inline: |
+          selinux: true
+          server:
+          token:

@@ -1,0 +1,21 @@
+FROM quay.io/fedora/fedora-coreos:stable as base
+COPY yum.repos.d/ /etc/yum.repos.d
+RUN rpm-ostree install kubectl \
+      container-selinux selinux-policy-base k3s-selinux && \
+  rm -rf /var/cache && \
+  ostree container commit
+COPY systemd/ /etc/systemd
+RUN curl -Lo /usr/bin/k3s \
+  https://github.com/k3s-io/k3s/releases/download/v1.28.6%2Bk3s2/k3s && \
+  chmod +x /usr/bin/k3s
+# Install qemu-guest-agent needed by kvm/libvirt
+RUN rpm-ostree install qemu-guest-agent && rm -rf /var/cache && \
+  ostree container commit
+
+FROM base as server
+RUN ln -s /etc/systemd/system/k3s@.service \
+  /etc/systemd/system/multi-user.target.wants/k3s@server.service
+
+FROM base as agent
+RUN ln -s /etc/systemd/system/k3s@.service \
+  /etc/systemd/system/multi-user.target.wants/k3s@agent.service

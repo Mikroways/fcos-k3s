@@ -1,0 +1,15 @@
+[Unit]
+Description=Fetch and deploy target image
+# Only run on the firstboot
+ConditionFirstBoot=true
+After=network-online.target
+Wants=network-online.target
+Before=zincati.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=rpm-ostree rebase --reboot ostree-unverified-registry:quay.io/chrodriguez/fcos-k3s:server
+
+[Install]
+WantedBy=multi-user.target
