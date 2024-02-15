@@ -37,7 +37,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         context: "{{defaultContext}}:layered-image"
-        file: ${{ context }}/Containerfile
+        file: ./Containerfile
 
     - name: Build and push Docker server image
       uses: docker/build-push-action@v5
@@ -45,7 +45,7 @@ jobs:
         push: true
         tags: ${{ env.REGISTRY }}/server:latest
         context: "{{defaultContext}}:layered-image"
-        file: ${{ context }}/Containerfile
+        file: ./Containerfile
         target: server
 
     - name: Build and push Docker agent image
