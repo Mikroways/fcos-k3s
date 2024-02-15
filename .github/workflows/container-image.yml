@@ -43,7 +43,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: ${{ env.SERVER_IMAGE_NAME }}/server:latest
+        tags: ${{ env.SERVER_IMAGE_NAME }}:latest
         context: "{{defaultContext}}:layered-image"
         file: ./Containerfile
         target: server
@@ -52,5 +52,5 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: ${{ env.AGENT_IMAGE_NAME }}/agent:latest
+        tags: ${{ env.AGENT_IMAGE_NAME }}:latest
         target: agent
