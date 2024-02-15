@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: ${{ env.REGISTRY}}/${{ github.repository }}/server
-  AGENT_IMAGE_NAME: ${{ env.REGISTRY}}/${{ github.repository }}/agent
+  SERVER_IMAGE_NAME: ghcr.io/${{ github.repository }}/server
+  AGENT_IMAGE_NAME: ghcr.io/${{ github.repository }}/agent
 
 jobs:
   build-and-push-image:
