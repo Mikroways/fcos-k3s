@@ -36,12 +36,16 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+        context: "{{defaultContext}}:layered-image"
+        file: ${{ context }}/Containerfile
 
     - name: Build and push Docker server image
       uses: docker/build-push-action@v4
       with:
         push: true
         tags: ${{ env.REGISTRY }}/server:latest
+        context: "{{defaultContext}}:layered-image"
+        file: ${{ context }}/Containerfile
         target: server
 
     - name: Build and push Docker agent image
