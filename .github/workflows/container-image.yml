@@ -8,8 +8,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: ghcr.io/${{ github.repository }}/server
-  AGENT_IMAGE_NAME: ghcr.io/${{ github.repository }}/agent
 
 jobs:
   build-and-push-image:
@@ -19,6 +17,10 @@ jobs:
       packages: write
 
     steps:
+    - name: Setup server image name
+      run: |
+        echo "SERVER_IMAGE_NAME=`echo ghcr.io/${{github.repository}}/server | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
+        echo "AGENT_IMAGE_NAME=`echo ghcr.io/${{github.repository}}/agent | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
     - name: Checkout repo
       uses: actions/checkout@v3
       with:
@@ -36,8 +38,6 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-        context: "{{defaultContext}}:layered-image"
-        file: ./Containerfile
 
     - name: Build and push Docker server image
       uses: docker/build-push-action@v5
@@ -54,3 +54,5 @@ jobs:
         push: true
         tags: ${{ env.AGENT_IMAGE_NAME }}:latest
         target: agent
+        file: ./Containerfile
+        context: "{{defaultContext}}:layered-image"
