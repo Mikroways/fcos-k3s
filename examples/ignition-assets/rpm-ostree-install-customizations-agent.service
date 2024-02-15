@@ -9,7 +9,7 @@ Before=zincati.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=rpm-ostree rebase --reboot ostree-unverified-registry:quay.io/chrodriguez/fcos-k3s:agent
+ExecStart=rpm-ostree rebase --reboot ostree-unverified-registry:ghcr.io/mikroways/fcos-k3s/agent:latest
 
 [Install]
 WantedBy=multi-user.target
