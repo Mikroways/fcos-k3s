@@ -34,5 +34,5 @@ ejemplo usando GH Actions.
 
 Las imagenes que se generan son:
 
-* **K3s Server:** 
-* **K3s Agent:**
+* **K3s Server:** ghcr.io/mikroways/fcos-k3s/server:latest
+* **K3s Agent:**  ghcr.io/mikroways/fcos-k3s/agent:latest
