@@ -5,3 +5,11 @@ k3s-node-1:
   numcpus: 2
   disks:
    - size: 10
+
+k3s-node-2:
+  template: fcos-39.20240128.3.0
+  profile: default
+  memory: 2048
+  numcpus: 2
+  disks:
+   - size: 10
