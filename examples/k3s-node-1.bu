@@ -15,5 +15,7 @@ storage:
       contents:
         inline: |
           selinux: true
-          server:
-          token:
+    - path: /etc/rancher/k3s/config.yaml.d/agent.yaml
+      mode: 0600
+      contents:
+        local: ignition-assets/agent.yaml

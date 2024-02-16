@@ -49,11 +49,32 @@ kcli delete plan k3s-with-selinux
 Los agentes, son similares al server. Solamente difieren en que el servicio que
 inician corresponde a un nodo y no un server. Sin embargo, para que se unan al
 cluster, necesitamos setear en el agente una serie de datos que se obtienen del
-maestro:
+**server**:
 
 * La URL del servidor
 * El token para que un nodo se una al cluster
 
+Nos conectamos entonces al **server** y obtenemos los datos que necesitamos.
+Primero el token:
+
 ```bash
+kcli ssh k3s-with-selinux sudo cat /var/lib/rancher/k3s/server/token
+# Debe devolver algo como K10c3451b9404911d97b3688fcd6a70aa21ca3412330ed20ed688efcfdc433cb86b
 ```
 
+La ip del nodo, podemos obtenerla usando: kcli 
+
+```bash
+kcli show vm k3s-with-selinux -f ip
+# Devuelve algo como: ip: 192.168.60.126
+```
+
+Entonces, asumiendo las salidas antes comentadas, tomamos como modelo el archivo
+`ignition-assets/agent.yaml.tpl` y lo copiamos en
+`ignition-assets/agent.yaml` con los datos correctos.
+
+Luego podemos iniciar el/los nuevos nodos agentes usando:
+
+```bash
+kcli create plan k3s-nodes -f k3s-nodes.yml
+```
