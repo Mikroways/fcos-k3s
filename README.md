@@ -19,6 +19,10 @@ estos directorios modificando los ejemplos según sea necesario.
 
 Dentro del directorio hay más documentación.
 
+Además, hemos agregado otro ejemplo que simula la instalación en un ámbito
+aislado, donde no las máquinas a instalar no tengan salida a internet. Este
+ejemplo puede seguirse en la carpeta [`examples-airgapped/`](./examples-airgapped)
+
 ## Generación de la capa layered
 
 Como se explica en la documentación propia de coreos mencionada en la
