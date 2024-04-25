@@ -1,0 +1,20 @@
+k3s-airgapped-node-1:
+  template: fcos-39.20240128.3.0
+  profile: default
+  memory: 2048
+  numcpus: 2
+  disks:
+   - size: 10
+  nets:
+    - name: local
+      mac: "cc:cc:cc:cc:cc:01"
+k3s-airgapped-node-2:
+  template: fcos-39.20240128.3.0
+  profile: default
+  memory: 2048
+  numcpus: 2
+  disks:
+   - size: 10
+  nets:
+    - name: local
+      mac: "cc:cc:cc:cc:cc:02"
