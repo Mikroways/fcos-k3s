@@ -6,21 +6,8 @@ systemd:
       enabled: true
       contents_local: ignition-assets/rpm-ostree-install-customizations-server.service
 storage:
-  links:
-    - path: /etc/localtime
-      target: ../usr/share/zoneinfo/America/Argentina/Buenos_Aires
   files:
     - path: /etc/pki/ca-trust/source/anchors/custom.crt
       mode: 0644
       contents:
         local: registry/certs/ca.crt
-    - path: /etc/rancher/k3s/config.yaml
-      mode: 0600
-      contents:
-        inline: |
-          write-kubeconfig-mode: "0600"
-          selinux: true
-    - path: /etc/rancher/k3s/registries.yaml
-      mode: 0600
-      contents:
-        local: ignition-assets/registries.yaml
