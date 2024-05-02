@@ -127,10 +127,12 @@ Podemos entonces en un comando correr, una vez iniciado el nodo master, el
 siguiente comando:
 
 ```bash
-K3S_API_SERVER_IP=$(kcli show vm k3s-airgapped-server -f ip | \
-  cut -d: -f2 | tr -d ' ') \
+REGISTRY_IP=$(hostname -I | cut -f 1 -d ' ') \
+  K3S_API_SERVER_IP=$(kcli show vm k3s-airgapped-server -f ip | \
+    cut -d: -f2 | tr -d ' ') \
   K3S_API_SERVER_TOKEN=$(kcli ssh k3s-airgapped-server sudo \
-  cat /var/lib/rancher/k3s/server/token) make agent
+    cat /var/lib/rancher/k3s/server/token) \
+  make agent
 ```
 
 Luego podemos iniciar el/los nuevos nodos agentes usando:
@@ -148,6 +150,22 @@ Para destruir cada nodo:
 kcli delete vm k3s-airgapped-node-1
 kcli delete vm k3s-airgapped-node-2
 ```
+
+### Si no se usa ignition
+
+Si no se utiliza ignition files en tiempo de booteo, podemos remediarlo
+manualmente o con ansible realizando los siguientes pasos:
+
+* Copiar el archivo `registry/certs/ca.crt` a cada nodo en la carpeta
+  `/etc/pki/ca-trust/source/anchors/custom.crt`. Luego correr `update-ca-trust`
+* Copiar el archivo correspondiente a la unidad de systemd a decir:
+  * **server:**
+    `ignition-assets/rpm-ostree-install-customizations-server.service` en
+`/etc/systemd/system/`. Luego reiniciar
+  * **agents:**
+    `ignition-assets/rpm-ostree-install-customizations-agent.service` en
+`/etc/systemd/system/`. Luego reiniciar
+
 
 ### Destruir todo
 

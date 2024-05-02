@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 BUTANE := podman run --rm --interactive --security-opt label=disable --volume ${PWD}:/pwd --workdir /pwd quay.io/coreos/butane:release
-SKOPEO := podman run --rm --interactive --network=host --volume ${PWD}:/pwd quay.io/skopeo/stable:latest
+SKOPEO := podman run --rm --interactive --network=host --volume ${PWD}:/pwd \
+					-v ${HOME}/.local/share/containers/storage:/var/lib/containers/storage \
+					quay.io/skopeo/stable:latest
 ASSETS_DIR := ignition-assets
 TPL_DEP_SVC_FILES := $(shell find $(ASSETS_DIR) -type f -name '*.service.tpl')
 DEP_SVC_FILES := $(TPL_DEP_SVC_FILES:%.service.tpl=%.service)
@@ -18,7 +20,8 @@ CERT_SUBJ := $(CERT_SUBJ_PREFIX)CN=$(REGISTRY_DNS)
 CERT_ALTNAMES := [SAN]\nsubjectAltName=DNS:$(REGISTRY_DNS),IP:$(REGISTRY_IP)
 REGISTRY_CONTAINER_NAME := k3s-poc-registry
 
-.PHONY: all clean clean-agent .validate-envs certs load-local-registry agent
+.PHONY: all clean clean-agent .validate-envs certs load-local-registry agent \
+	load-server-image-local-registry load-agent-image-local-registry
 
 .validate-envs:
 	@if [ -z "${REGISTRY_IP}" ]; then \
@@ -26,6 +29,7 @@ REGISTRY_CONTAINER_NAME := k3s-poc-registry
 	fi
 
 all: $(SERVER_IGNITION_FILES) $(DEP_SVC_FILES) $(CERTS_DIR)/cert.crt $(CERTS_DIR)/cert.key
+	$(MAKE) load-server-image-local-registry
 
 $(ASSETS_DIR)/registries.yaml: $(ASSETS_DIR)/registries.yaml.tpl
 	$(MAKE) .validate-envs
@@ -88,11 +92,19 @@ load-local-registry:
 	for image in `cat tmp/manifest.json | jq -r '.[] | .RepoTags | join(",")'`; do \
 		$(SKOPEO) copy --dest-tls-verify=false --all docker-archive:/pwd/tmp/k3s-airgap-images-amd64.tar.gz:$${image} docker://$(REGISTRY_DNS)/$${image}; \
 	done
+
+load-server-image-local-registry:
+	$(MAKE) .validate-envs
+	podman build --target server -f Containerfile  . -t k3s-custom-server
 	$(SKOPEO) copy --dest-tls-verify=false --all \
-		docker://ghcr.io/mikroways/fcos-k3s/server:latest \
+		containers-storage:localhost/k3s-custom-server:latest \
 		docker://$(REGISTRY_DNS)/mikroways/fcos-k3s/server:latest
+
+load-agent-image-local-registry:
+	$(MAKE) .validate-envs
+	podman build --target agent -f Containerfile  . -t k3s-custom-agent
 	$(SKOPEO) copy --dest-tls-verify=false --all \
-		docker://ghcr.io/mikroways/fcos-k3s/agent:latest \
+		containers-storage:localhost/k3s-custom-agent:latest \
 		docker://$(REGISTRY_DNS)/mikroways/fcos-k3s/agent:latest
 
 
@@ -106,6 +118,7 @@ $(ASSETS_DIR)/agent.yaml: $(ASSETS_DIR)/agent.yaml.tpl
 	sed "s/SERVER_IP/${K3S_API_SERVER_IP}/g;s/TOKEN/${K3S_API_SERVER_TOKEN}/g" $< > $@
 
 agent: $(ASSETS_DIR)/agent.yaml $(AGENT_IGNITION_FILES)
+	$(MAKE) load-agent-image-local-registry
 
 clean-agent:
 	rm -f $(ASSETS_DIR)/agent.yaml
@@ -113,6 +126,6 @@ clean-agent:
 clean:
 	$(MAKE) clean-agent
 	rm -rf $(IGNITION_FILES) $(DEP_FILES) $(CERTS_DIR)
-	@sudo podman container exists $(REGISTRY_CONTAINER_NAME) && \
+	sudo podman container exists $(REGISTRY_CONTAINER_NAME) && \
 		sudo podman rm --force $(REGISTRY_CONTAINER_NAME) || true
-	@sudo podman volume rm registry
+	sudo podman volume exists registry && sudo podman volume rm registry || true
