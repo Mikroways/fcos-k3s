@@ -8,8 +8,9 @@ COPY systemd/ /etc/systemd
 RUN curl -Lo /usr/bin/k3s \
   https://github.com/k3s-io/k3s/releases/download/v1.28.6%2Bk3s2/k3s && \
   chmod +x /usr/bin/k3s
-# Install qemu-guest-agent needed by kvm/libvirt
-RUN rpm-ostree install qemu-guest-agent && rm -rf /var/cache && \
+# Install qemu-guest-agent needed by kvm/libvirt and open-vm-tools required by
+# vmware
+RUN rpm-ostree install qemu-guest-agent open-vm-tools && rm -rf /var/cache && \
   ostree container commit
 
 FROM base as server
