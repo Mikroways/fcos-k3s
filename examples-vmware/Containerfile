@@ -1,0 +1,12 @@
+FROM ghcr.io/mikroways/fcos-k3s/server:latest as server
+COPY ignition-assets/k3s-server /etc/rancher
+COPY ignition-assets/registries.yaml /etc/rancher/k3s/registries.yaml
+
+RUN ln -fs /usr/share/zoneinfo/America/Argentina/Buenos_Aires /etc/localtime
+
+FROM ghcr.io/mikroways/fcos-k3s/agent:latest as agent
+COPY ignition-assets/k3s-agent /etc/rancher
+COPY ignition-assets/registries.yaml /etc/rancher/k3s/registries.yaml
+COPY ignition-assets/agent.yaml /etc/rancher/k3s/config.yaml.d/agent.yaml
+
+RUN ln -fs /usr/share/zoneinfo/America/Argentina/Buenos_Aires /etc/localtime

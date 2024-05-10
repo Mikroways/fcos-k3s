@@ -1,0 +1,13 @@
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: rpm-ostree-install-customizations.service
+      enabled: true
+      contents_local: ignition-assets/rpm-ostree-install-customizations-server.service
+storage:
+  files:
+    - path: /etc/pki/ca-trust/source/anchors/custom.crt
+      mode: 0644
+      contents:
+        local: registry/certs/ca.crt
